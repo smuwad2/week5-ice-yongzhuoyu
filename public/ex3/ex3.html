@@ -33,33 +33,93 @@
     </div>
     
     <script>
-        function getCategories() {
-            // Fetch categories from the server using Axios
-            // and display them in the select element
+        async function getCategories() {
+            // only fetch categories from the server using Axios
             // url: http://localhost:3010/categories
-
+            try{
+                let response = await axios.get("/categories"); //no params are needed 
+                showCategories(response.data); //pass the array of categories as parameters to showCategories
+                console.log(response.data)
+            }catch (error){
+                console.log(error);
+            }
         }
 
         function showCategories(categories) {
             // Display the categories in the select element
-            
+            let sel = document.getElementById("selectCategory");
+
+            for(let i=0; i<categories.length; i++){
+                let name = categories[i];
+                let optElem = document.createElement("option");
+                optElem.textContent = name;
+                sel.appendChild(optElem);
+            }
         }
 
-        function getItems() {
+        async function getItems() {
             // Fetch items based on the selected category
             // If "To select" is chosen, do nothing
             // If "All" is chosen, fetch all items
             // If a specific category is chosen, fetch items for that category
             // url: http://localhost:3010/items?category=categoryName
-            
+
+            let categoryName = document.getElementById("selectCategory").value;
+            try{
+                let response;
+                if (categoryName === "all"){
+                    response = await axios.get("/items");
+                }
+                else{
+                    let response = await axios.get("/items", {
+                    params: {category : categoryName}
+                }); 
+                }
+
+                showItems(response.data); //pass the array of item objects filtered to the fruit category 
+                console.log(response.data)
+            }catch (error){
+                console.log(error);
+            }
         }
 
         function showItems(items) {
             // Display the items in the itemsList div
             // Each item should be displayed in a bootstrap card format
             // The display should be responsive 3 columns on large screens, 2 columns on medium screens, and 1 column on small screens
-            
+            let listElem = document.getElementById("itemsList");
 
+            while (listElem.firstChild) {
+                listElem.firstChild.remove();
+            }
+            for(let i=0; i<items.length; i++){
+
+                let item = items[i];
+
+                let col = document.createElement("div");
+                col.className = "col-md-6 col-lg-4"
+
+                let card = document.createElement("div");
+                card.className = "card";
+                card.style.width = "18rem";
+
+                let body = document.createElement("div");
+                body.className = "card-body";
+
+                let title = document.createElement("h5");
+                title.className = "card-title";
+                title.textContent = item["name"];
+
+                let subtitle = document.createElement("h6");
+                subtitle.className = "card-subtitle mb-2 text-body-secondary";
+                subtitle.textContent = item["price"];
+
+                body.append(title);
+                body.append(subtitle);
+                card.appendChild(body);
+                col.appendChild(card);
+                listElem.appendChild(col);
+            }
         }
 
     </script>
