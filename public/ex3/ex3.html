@@ -71,7 +71,7 @@
                     response = await axios.get("/items");
                 }
                 else{
-                    let response = await axios.get("/items", {
+                    response = await axios.get("/items", {
                     params: {category : categoryName}
                 }); 
                 }
